@@ -2,16 +2,16 @@ module Refinery
   module Menus
     module Admin
       class MenusController < ::Refinery::AdminController
-        
+
         crudify :'refinery/menus/menu', 
                 :xhr_paging => true, 
                 :sortable => false,
                 :include => [:links],
                 :redirect_to_url => "refinery.menus_admin_menus_path"
-        
+
         before_filter :find_menu_links, only: [:edit, :update]
         before_filter :set_links_positions, only: [:create, :update]
-        
+
         private
 
         # Based upon http://github.com/matenia/jQuery-Awesome-Nested-Set-Drag-and-Drop
@@ -59,11 +59,11 @@ module Refinery
             end
           end
         end
-        
+
         def find_menu_links
           @menu_links = @menu.roots
         end
-        
+
       end
     end
   end
