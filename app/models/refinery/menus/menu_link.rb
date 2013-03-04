@@ -1,5 +1,3 @@
-require 'initforthe-routes'
-
 module Refinery
   module Menus
     class MenuLink < Refinery::Core::BaseModel

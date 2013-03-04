@@ -16,7 +16,7 @@ module Refinery
       refinery_page: {
         klass: 'Refinery::Page',
         title_attr: 'title',
-        scope: Proc.new { live.order('lft ASC') }
+        scope: -> { live.order('lft ASC') }
       },
       refinery_resource: {
         klass: 'Refinery::Resource',
