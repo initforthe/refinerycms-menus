@@ -14,7 +14,11 @@ module Refinery
       accepts_nested_attributes_for :links, :allow_destroy => true
 
       def roots
-        @roots ||= links.select {|pos| pos.parent_id.nil?}
+        @roots ||= prepared_links.select(&:root?)
+      end
+
+      def prepared_links
+        @prepared_links ||= links.map { |link| link.collection? ? link.collection_links : link }.flatten
       end
     end
   end

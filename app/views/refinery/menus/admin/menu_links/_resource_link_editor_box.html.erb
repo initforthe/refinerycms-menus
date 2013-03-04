@@ -16,6 +16,11 @@
       </ul>
     </div>
     <% # add resource type here %>
+    <%- if collections = Refinery::Menus::MenuLink.resource_config(resource_type)[:collections] -%>
+      <div class='pp-collection-box'>
+        <%= select_tag :collection, options_for_select(collections.keys), prompt: 'Choose a collection' %>
+      </div>
+    <%- end -%>
     <%= f.submit t('add', :scope => 'refinery.menus.admin.menu_links', resource: resource_type.to_s.titleize)  %>
   <% end %>
 <% end %>

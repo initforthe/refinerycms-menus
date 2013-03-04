@@ -8,7 +8,7 @@ module Refinery
             format.js do
               @menu_links = []
               if params[:collection].present?
-
+                @menu_links << MenuLink.create(params[:menu_link].merge(collection: params[:collection]))
               elsif params[:refinery_resource_ids]
                 params[:refinery_resource_ids].each do |id|
                   @menu_links << MenuLink.create({refinery_resource_id: id}.merge(params[:menu_link]))
