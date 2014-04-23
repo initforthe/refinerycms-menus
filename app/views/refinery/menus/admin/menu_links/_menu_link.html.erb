@@ -7,11 +7,13 @@
     </div>
     <div class='body'>
       <%= f.hidden_field :id %>
-      <% if f.object.custom_link? %>
-        <%= render partial: "refinery/menus/admin/menu_links/custom_link", object: menu_link, locals: {f: f} %>
-      <% else %>
-        <%= render partial: "refinery/menus/admin/menu_links/resource_link", object: menu_link, locals: {f: f} %>
-      <% end %>
+      <%- unless menu_link.collection? -%>
+        <% if f.object.custom_link? %>
+          <%= render partial: "refinery/menus/admin/menu_links/custom_link", object: menu_link, locals: {f: f} %>
+        <% else %>
+          <%= render partial: "refinery/menus/admin/menu_links/resource_link", object: menu_link, locals: {f: f} %>
+        <% end %>
+      <%- end -%>
 
       <%= link_to t('remove', :scope => 'refinery.menus.admin.menu_links'), refinery.menus_admin_menu_link_path(menu_link),
                   method: :delete,
@@ -19,10 +21,12 @@
                   class: 'remove' %>
     </div>
 
-    <ul class='nested'>
-      <% menu_link.children.each do |child|  %>
-        <%= render partial: 'refinery/menus/admin/menu_links/menu_link', object: child %>
-      <% end %>
-    </ul>
+    <%- unless menu_link.collection? -%>
+      <ul class='nested'>
+        <% menu_link.children.each do |child|  %>
+          <%= render partial: 'refinery/menus/admin/menu_links/menu_link', object: child %>
+        <% end %>
+      </ul>
+    <%- end -%>
   </li>
 <% end %>

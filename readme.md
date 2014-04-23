@@ -1,4 +1,4 @@
-# Menus extension for Refinery CMS
+# Menus Extension for Refinery CMS
 
 [![Build Status](https://travis-ci.org/pylonweb/refinerycms-menus.png?branch=master)](https://travis-ci.org/pylonweb/refinerycms-menus)
 [![Dependency Status](https://gemnasium.com/pylonweb/refinerycms-menus.png)](https://gemnasium.com/pylonweb/refinerycms-menus)
@@ -6,7 +6,7 @@
 <!--[![Gem Version](https://badge.fury.io/rb/refinerycms-menus.png)](http://badge.fury.io/rb/refinerycms-menus)-->
 ## About
 
-Refinery Menus allows you to create and edit several custom menus for your Refinery CMS app. It gives you the ability to add links to any kind of model you want. As default are custom links (fx http://google.com, http://github.com etc.) Refinery Pages and Refinery Resources (files). See the screenshot below for an example.
+Menus allows you to create and edit several custom menus for your Refinery CMS app. It gives you the ability to add links to any kind of model you want. As default are custom links (fx http://google.com, http://github.com etc.) Refinery Pages and Refinery Resources (files). See the screenshot below for an example.
 
 ## Requirements
 
@@ -93,7 +93,7 @@ Here is a example of how Refinery Pages are added as a custom resource model:
 config.menu_resources = refinery_page: {
                 klass: 'Refinery::Page',
                 title_attr: 'title',
-                scope: Proc.new { live.order('lft ASC') }
+                scope: -> { live.order('lft ASC') }
              }
 ```
 

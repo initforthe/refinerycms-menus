@@ -2,9 +2,9 @@ module Refinery
   module Menus
     class MenuLink < Refinery::Core::BaseModel
       self.table_name = "refinery_menus_links"
-      
+
       attr_accessible :parent_id, :refinery_page_id, :refinery_menu_id, :resource, :resource_id, :resource_type,
-                      :title_attribute, :custom_url, :label, :menu, :id_attribute, :class_attribute
+                      :title_attribute, :custom_url, :label, :menu, :id_attribute, :class_attribute, :collection
 
       belongs_to :menu, :class_name => '::Refinery::Menus::Menu', :foreign_key => :refinery_menu_id
       belongs_to :resource, :polymorphic => true
@@ -20,9 +20,8 @@ module Refinery
 
       def self.find_all_of_type(type)
         # find all resources of the given type, determined by the configuration
-        # TODO - we may want to allow configuration of conditions (DONE), ordering, etc
         if scope = self.resource_config(type)[:scope]
-          scope.is_a?(Symbol) ? resource_klass(type).send(scope) : resource_klass(type).instance_eval(&scope)
+          scope.is_a?(Symbol) ? resource_klass(type).send(scope) : resource_klass(type).instance_exec(&scope)
         else
           resource_klass(type).all
         end
@@ -37,21 +36,27 @@ module Refinery
       end
 
       def set_label
-        if label.blank?
-          if custom_link?
-            begin
-              self.label = custom_url.match(/(\w+)\.\w+$/).captures.join.titleize
-            rescue
-              self.label = custom_url
-            end
-          else
-            self.label = resource.send(resource_config[:title_attr])
+        return if label.present?
+
+        self.label = if collection?
+          "Collection: #{collection}"
+        elsif custom_link?
+          begin
+            custom_url.match(/(\w+)\.\w+$/).captures.join.titleize
+          rescue
+            custom_url
           end
+        else
+          resource_title
         end
       end
 
       def resource_klass
         Refinery::Menus::MenuLink.resource_klass(resource_type)
+      end
+
+      def root?
+        parent_id.nil?
       end
 
       def resource_config
@@ -66,6 +71,28 @@ module Refinery
         resource_type.titleize
       end
 
+      def collection?
+        collection.present?
+      end
+
+      def collection_links
+        @collection_links ||= begin
+          collector = resource_config[:collections][collection.to_sym]
+          resource_klass.instance_exec(&collector).map do |item|
+            build_collection_link(item)
+          end
+        end
+      end
+
+      def build_collection_link(resource)
+        dup.tap do |item|
+          item.collection = nil
+          item.label = nil
+          item.resource_id = resource.id
+          item.set_label
+        end
+      end
+
       def custom_link?
         resource_id.nil? || resource_type.nil?
       end
@@ -75,7 +102,7 @@ module Refinery
       end
 
       def resource
-        return nil if custom_link?
+        return nil if custom_link? || collection?
         resource_klass.find(resource_id)
       end
 
@@ -88,7 +115,13 @@ module Refinery
       end
 
       def resource_url
-        resource.present? ? resource.url : '/'
+        if resource.respond_to?(:url)
+          resource.url
+        elsif resource_config[:url]
+          Initforthe::Routes.route(resource, &resource_config[:url])
+        else
+          '/'
+        end
       end
 
       def resource=(record)
