@@ -157,13 +157,15 @@ module Refinery
 
       def to_refinery_menu_item
         {
-          :id => id,
+          :id => id || parent_id,
           :lft => lft,
           :menu_match => menu_match,
           :parent_id => parent_id,
           :rgt => rgt,
           :title => label,
           :type => self.class.name,
+          :original_id => id || parent_id,
+          :original_type => self.class.name,
           :url => url,
           :html => {
             :id => id_attribute,
